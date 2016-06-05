@@ -14,15 +14,22 @@ app.get('/', function(req, res){
 });
 
 app.get('/todos', function(req, res){
-    // express funtion to convert to JSON:
-    res.json(todos);
+    var queryParams = req.query;
+    var filteredTodos = todos; // array
+
+    if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
+        filteredTodos = _.where(filteredTodos, {completed:true});
+    } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
+        filteredTodos = _.where(filteredTodos, {completed:false});
+    }
+    res.json(filteredTodos); // express funtion to convert to JSON:
 });
 //-----------------------------------------------------------------------------
 app.get('/todos/:id', function(req, res){
     var todoId = parseInt(req.params.id, 10);
     // Looks through the list and returns the first value that matches all of
     // the key-value pairs:
-    var matchedTodo = _.findWhere(todos, {id: todoId});
+    var matchedTodo = _.findWhere(todos, {id: todoId}); // finds one instance
 
     if (matchedTodo) {
         res.json(matchedTodo);
@@ -87,5 +94,6 @@ app.put('/todos/:id', function(req, res){
 
 //----------------------------------------------
 app.listen(PORT, function(){
+    //debugger;
     console.log('Magic happens on port ' + PORT);
 });
