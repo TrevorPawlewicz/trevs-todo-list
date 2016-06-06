@@ -1,6 +1,7 @@
 // needed for sql database
 
 var Sequelize = require('sequelize');
+// process is an object that has key:value pairs
 var env = process.env.NODE_ENV || 'development';
 var sequelize;
 
