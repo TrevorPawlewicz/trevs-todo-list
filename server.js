@@ -35,15 +35,16 @@ app.get('/todos', function(req, res){
 //-----------------------------------------------------------------------------
 app.get('/todos/:id', function(req, res){
     var todoId = parseInt(req.params.id, 10);
-    // Looks through the list and returns the first value that matches all of
-    // the key-value pairs:
-    var matchedTodo = _.findWhere(todos, {id: todoId}); // finds one instance
 
-    if (matchedTodo) {
-        res.json(matchedTodo);
-    } else {
-        res.status(404).send();
-    }
+    db.todo.findById(todoId).then(function(todo){
+        if (!!todo) {
+            res.json(todo.toJSON());
+        } else {
+            res.status(404).send();
+        }
+    }, function (e) {
+            res.status(500).send();
+    });
 });
 //-----------------------------------------------------------------------------
 app.post('/todos', function(req, res) {
