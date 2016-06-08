@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore'); // underscore.js downloaded npm
 var db = require('./db.js'); // access to database
+var bcrypt = require('bcrypt'); // hash and salt password
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -110,7 +111,7 @@ app.put('/todos/:id', function(req, res){
         res.status(500).send();
     });
 });
-
+//-------------------POST/users--------------------------------------
 app.post('/users', function (req, res) {
 	//                   pick takes object and attributes you want to keep
 	var body = _.pick(req.body, 'email', 'password');
@@ -121,8 +122,32 @@ app.post('/users', function (req, res) {
 	}, function (e) { // error
 		res.status(400).json(e);
 	});
-});
-//-----------------------------------------------------------------------------
+}); //-------------------------------------------------------------
+//------------------POST/users/login--------------------------------------
+app.post('/users/login', function (req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	if (typeof body.email !== 'string' || typeof body.password !== 'string') {
+		return res.status(400).send();
+	}
+
+	db.user.findOne({
+		// you can pass a "where" object to filter the query
+		where: {
+			email: body.email
+		}
+	}).then(function (user) { // promise
+		if (!user || !bcrypt.compareSync(body.password, user.get('password_hash'))) {
+			return res.status(401).send(); // Auth is possible but failed
+		}
+		// PublicJSON only exposes the data we wnat public, not ALL data
+		res.json(user.toPublicJSON());
+
+	}, function (e) { // error
+		res.status(500).send();
+	});
+}); // --------------------------------------------------------------------
+
 //--------------SYNC------------------------
 db.sequelize.sync().then(function(){
     app.listen(PORT, function(){
