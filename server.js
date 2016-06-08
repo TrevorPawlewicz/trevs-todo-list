@@ -1,9 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var app = express();
 var _ = require('underscore'); // underscore.js downloaded npm
 var db = require('./db.js'); // access to database
 
+var app = express();
 var PORT = process.env.PORT || 3000;
 var todos = [];
 var todoNextId = 1;
@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 app.get('/', function(req, res){
     res.send('Todo API Root');
 });
+
 
 app.get('/todos', function(req, res){
     var query = req.query;
@@ -108,6 +109,18 @@ app.put('/todos/:id', function(req, res){
     }, function() {
         res.status(500).send();
     });
+});
+
+app.post('/users', function (req, res) {
+	//                   pick takes object and attributes you want to keep
+	var body = _.pick(req.body, 'email', 'password');
+
+	//                                 returns a promise
+	db.user.create(body).then(function (user) {
+		res.json(user.toJSON());
+	}, function (e) { // error
+		res.status(400).json(e);
+	});
 });
 //-----------------------------------------------------------------------------
 //--------------SYNC------------------------

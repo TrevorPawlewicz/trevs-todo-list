@@ -1,5 +1,3 @@
-// needed for sql database
-
 var Sequelize = require('sequelize');
 // process is an object that has key:value pairs
 var env = process.env.NODE_ENV || 'development';
@@ -19,6 +17,7 @@ if (env === 'production') { // only true if running on Heroku
 var db = {}; // object with potentially many js keys: values
 
 db.todo = sequelize.import(__dirname + '/models/todo.js');
+db.user = sequelize.import(__dirname + '/models/user.js');
 db.sequelize = sequelize; // add new instance
 db.Sequelize = Sequelize; // add module library
 // exports can only can be set to one oject
